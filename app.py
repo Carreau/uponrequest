@@ -11,21 +11,33 @@ import os
 from sendgrid.helpers.mail import Mail, Email, To, Content, Header, ReplyTo
 
 
+def parse_header(heads):
+    values = {}
+    for l in heads.splitlines():
+        k, v = l.split(":", maxsplit=1)
+        values[k] = v
+    return values
+
+
 def reply(msg):
     print("vvvvvvvvvv")
+    headers = parse_header(msg['headers'])
+    print('Parsed Headers': headers)
     sg = sendgrid.SendGridAPIClient(api_key=os.environ.get("SENDGRID_TOKEN"))
     from_email = Email("test@parse.availableuponrequest.org")
     to_email = To(msg["from"])  # Change to your recipient
     subject = "Re: " + msg["subject"]
     content = Content("text/plain", "Reply\n" + indent(msg["text"], "> "))
     mail = Mail(from_email, to_email, subject, content)
-    prev_id = msg.get("Message-ID", None)
+    prev_id = headers.get("Message-ID", None)
     print("Found prev id:", prev_id)
     print("-----")
     if prev_id:
         p = mail.personalizations[0]
         p.add_header(Header("In-Reply-To", prev_id))
         p.add_header(Header("References", prev_id))
+    else:
+        return
 
     mail_json = mail.get()
 
