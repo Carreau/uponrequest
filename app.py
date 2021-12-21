@@ -14,7 +14,7 @@ from sendgrid.helpers.mail import Mail, Email, To, Content, Header, ReplyTo
 def reply(msg):
     print("vvvvvvvvvv")
     sg = sendgrid.SendGridAPIClient(api_key=os.environ.get("SENDGRID_TOKEN"))
-    from_email = Email("noreply@availableuponrequest.org")
+    from_email = Email("test@parse.availableuponrequest.org")
     to_email = To(msg["from"])  # Change to your recipient
     subject = "Re: " + msg["subject"]
     content = Content("text/plain", "Reply\n" + indent(msg["text"], "> "))
