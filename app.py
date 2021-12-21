@@ -1,6 +1,7 @@
 from flask import Flask, request
 import os
 from textwrap import indent
+from there import print
 
 
 app = Flask(__name__)
@@ -11,6 +12,7 @@ from sendgrid.helpers.mail import Mail, Email, To, Content, Header, ReplyTo
 
 
 def reply(msg):
+    print("vvvvvvvvvv")
     sg = sendgrid.SendGridAPIClient(api_key=os.environ.get("SENDGRID_TOKEN"))
     from_email = Email("noreply@availableuponrequest.org")
     to_email = To(msg["from"])  # Change to your recipient
@@ -18,8 +20,9 @@ def reply(msg):
     content = Content("text/plain", "Reply\n" + indent(msg["text"], "> "))
     mail = Mail(from_email, to_email, subject, content)
     prev_id = msg.get("Message-ID", None)
+    print("Found prev id:", prev_id)
+    print("-----")
     if prev_id:
-        print("Found prev id:", prev_id)
         p = mail.personalizations[0]
         p.add_header(Header("In-Reply-To", prev_id))
         p.add_header(Header("References", prev_id))
@@ -31,8 +34,11 @@ def reply(msg):
         return
     # Send an HTTP POST request to /mail/send
     response = sg.client.mail.send.post(request_body=mail_json)
+    print("-----")
     print(response.status_code)
+    print("-----")
     print(response.headers)
+    print("^^^^^^^^")
 
 
 @app.route("/")
@@ -50,11 +56,17 @@ def test():
 @app.route('/email', methods=['POST'])
 def receive_email():
     print("Headers:", request.form["headers"])
+    print("-----")
     print("From:", request.form["from"])
+    print("-----")
     print("To:", request.form["to"])
+    print("-----")
     print("Subject:", request.form["subject"])
+    print("-----")
     print("Body:", request.form["text"])
+    print("-----")
     reply(request.form)
+    print("-----")
     return ""
 
 
