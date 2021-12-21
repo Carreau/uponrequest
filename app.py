@@ -26,8 +26,8 @@ def reply(msg):
 
     mail_json = mail.get()
 
-    if to_email != "bussonniermatthias@gmail.com":
-        print("Not to self", to_email)
+    if to_email.email != "bussonniermatthias@gmail.com":
+        print("Not to self", to_email.email)
         return
     # Send an HTTP POST request to /mail/send
     response = sg.client.mail.send.post(request_body=mail_json)
