@@ -17,7 +17,7 @@ def reply(msg):
     subject = "Re: " + msg["subject"]
     content = Content("text/plain", "Reply\n" + indent(msg["text"], "> "))
     mail = Mail(from_email, to_email, subject, content)
-    prev_id = msg["headers"].get("Message-ID", None)
+    prev_id = msg.get("Message-ID", None)
     if prev_id:
         print("Found prev id:", prev_id)
         p = mail.personalizations[0]
