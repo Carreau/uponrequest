@@ -24,7 +24,7 @@ def reply(msg):
     headers = parse_header(msg['headers'])
     print('Parsed Headers': headers)
     sg = sendgrid.SendGridAPIClient(api_key=os.environ.get("SENDGRID_TOKEN"))
-    from_email = Email("test@parse.availableuponrequest.org")
+    from_email = Email("noreply@availableuponrequest.org")
     to_email = To(msg["from"])  # Change to your recipient
     subject = "Re: " + msg["subject"]
     content = Content("text/plain", "Reply\n" + indent(msg["text"], "> "))
