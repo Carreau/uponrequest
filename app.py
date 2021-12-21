@@ -2,32 +2,42 @@ from flask import Flask, request
 import os
 from textwrap import indent
 from there import print
+from random import choice
 
-
-app = Flask(__name__)
 
 import sendgrid
-import os
-from sendgrid.helpers.mail import Mail, Email, To, Content, Header, ReplyTo
+from sendgrid.helpers.mail import Mail, Email, To, Content, Header
+
+app = Flask(__name__)
 
 
 def parse_header(heads):
     values = {}
-    for l in heads.splitlines():
-        k, v = l.split(":", maxsplit=1)
+    for line in heads.splitlines():
+        k, v = line.split(":", maxsplit=1)
         values[k] = v
     return values
 
 
+REASONS = [
+    "Thanks for your email, unfortunately the post doc that did the experiment is no longer in our lab.",
+    "I appreciate your interest, I believe the data is on my old laptop. I'll try to find it 'soon' and get back to you",
+    "Hello, I'm no longer in academia, please contact another author",
+]
+
+
+INCLUDE_USERS = ()
+
+
 def reply(msg):
     print("vvvvvvvvvv")
-    headers = parse_header(msg['headers'])
-    print('Parsed Headers': headers)
+    headers = parse_header(msg["headers"])
+    print("Parsed Headers:", headers)
     sg = sendgrid.SendGridAPIClient(api_key=os.environ.get("SENDGRID_TOKEN"))
     from_email = Email("noreply@availableuponrequest.org")
     to_email = To(msg["from"])  # Change to your recipient
     subject = "Re: " + msg["subject"]
-    content = Content("text/plain", "Reply\n" + indent(msg["text"], "> "))
+    content = Content("text/plain", choice(REASONS) + "\n" + indent(msg["text"], "> "))
     mail = Mail(from_email, to_email, subject, content)
     prev_id = headers.get("Message-ID", None)
     print("Found prev id:", prev_id)
@@ -41,7 +51,7 @@ def reply(msg):
 
     mail_json = mail.get()
 
-    if to_email.email != "bussonniermatthias@gmail.com":
+    if to_email.email not in INCLUDE_USERS:
         print("Not to self", to_email.email)
         return
     # Send an HTTP POST request to /mail/send
@@ -65,7 +75,7 @@ def test():
     return "ok"
 
 
-@app.route('/email', methods=['POST'])
+@app.route("/email", methods=["POST"])
 def receive_email():
     print("Headers:", request.form["headers"])
     print("-----")
@@ -84,4 +94,4 @@ def receive_email():
 
 if __name__ == "__main__":
     print("MAIN")
-    ap.run(host="0.0.0.0", port=int(env.get("PORT", 5000)))
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
