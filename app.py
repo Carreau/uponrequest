@@ -27,4 +27,4 @@ def receive_email():
 
 if __name__ == "__main__":
     print("MAIN")
-    ap.run(port=int(env.get("PORT", 5000)))
+    ap.run(host="0.0.0.0", port=int(env.get("PORT", 5000)))
