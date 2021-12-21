@@ -3,6 +3,12 @@ from flask import Flask, request
 app = Flask(__name__)
 
 
+@app.route("/test")
+def test():
+    print("working")
+    return "ok"
+
+
 @app.route('/email', methods=['POST'])
 def receive_email():
     print('From:', request.form['from'])
