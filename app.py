@@ -1,4 +1,5 @@
 from flask import Flask, request
+import os
 
 app = Flask(__name__)
 
@@ -22,3 +23,8 @@ def receive_email():
     print('Subject:', request.form['subject'])
     print('Body:', request.form['text'])
     return ''
+
+
+if __name__ == "__main__":
+    print("MAIN")
+    ap.run(port=int(env.get("PORT", 5000)))
